@@ -1,0 +1,2 @@
+# notion-faster
+notion tools
