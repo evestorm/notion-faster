@@ -1,0 +1,3 @@
+.full-width .notion-frame div.notion-scroller.vertical div[style^="max-width: 100%"][style*="min-width: 0px;"]:first-of-type {
+    width: 100% !important;
+}

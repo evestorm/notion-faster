@@ -1,0 +1,65 @@
+{
+  "manifest_version": 3,
+  "name": "Notion Faster",
+  "version": "1.0",
+  "description": "Enhance the features of notion",
+  "icons": {
+    "16": "src/images/icon-16.png",
+    "32": "src/images/icon-32.png",
+    "48": "src/images/icon-48.png",
+    "128": "src/images/icon-128.png"
+  },
+  "content_scripts": [{
+    "js": [
+      "src/scripts/content.js"
+    ],
+    "matches": [
+      "https://www.notion.so/*",
+      "https://*.notion.site/*"
+    ],
+    "run_at": "document_end"
+  }],
+  "permissions": ["scripting", "storage"],
+  "web_accessible_resources": [
+    {
+      "matches": ["https:\/\/www.notion.so\/*"],
+      "resources": [
+        "src/utils/index.js",
+        "src/images/eye.svg",
+        "src/images/eye-hidden.svg",
+        "src/assets/styles/outline.css",
+        "src/assets/styles/fullPages.css",
+        "src/assets/styles/smallText.css",
+        "src/plugins/Outline/Outline.js",
+        "src/plugins/FullPages/FullPages.js",
+        "src/plugins/SmallText/SmallText.js"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "index.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "commands": {
+    "show-outline": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+O"
+      },
+      "description": "Show or hide the outline."
+    },
+    "show-fullPages": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K"
+      },
+      "description": "Set full width for all pages by default."
+    },
+    "show-smallText": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Z"
+      },
+      "description": "Set small text for all pages by default."
+    }
+  }
+}

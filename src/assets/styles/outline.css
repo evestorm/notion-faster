@@ -1,0 +1,106 @@
+:root {
+    --outline-width: 200px;
+    --outline-header-height: 40px;
+    --header-title-height: 30px;
+    --outline-normal-color: #585a5a;
+    --outline-active-color: #282828;
+    --outline-hover-color: #000;
+    --padding-gap: 10px;
+}
+
+.outline-wrapper.show+.notion-scroller.vertical {
+    width: calc(100% - var(--outline-width)) !important;
+}
+
+.outline-wrapper {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--outline-width);
+    font-size: 14px;
+    box-sizing: border-box;
+    padding: 0 var(--padding-gap) var(--padding-gap) var(--padding-gap);
+    background: transparent;
+    color: var(--outline-normal-color);
+    border-left: 1px solid #f2f2f2;
+    box-shadow: 1px 0 3px 2px #f5f5f5;
+}
+.notion-body.dark .outline-wrapper {
+    filter: invert(100%);
+}
+
+.outline-wrapper.show {
+    display: block;
+}
+
+.outline-wrapper div.header-title a {
+    height: var(--header-title-height);
+    line-height: var(--header-title-height);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.outline-wrapper div.header-title:hover {
+    cursor: pointer;
+}
+
+.outline-wrapper a {
+    color: inherit;
+    display: block;
+}
+
+.outline-wrapper a:link {
+    color: inherit;
+    text-decoration: none;
+}
+.outline-wrapper a:visited {
+    color: var(--outline-normal-color);
+    text-decoration: none;
+}
+.outline-wrapper a:hover {
+    color: var(--outline-hover-color);
+    font-weight: 500;
+    text-decoration: none;
+}
+.outline-wrapper .outline-header {
+    position: sticky;
+    background: transparent;
+    left: 0;
+    top: 0;
+    height: var(--outline-header-height);
+    line-height: var(--outline-header-height);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--outline-hover-color);
+}
+/*.notion-body.dark .outline-wrapper .outline-header {*/
+/*    filter: invert(100%);*/
+/*}*/
+
+.outline-wrapper .outline-header .item {
+    padding-right: 10px;
+}
+.outline-wrapper .outline-header img.item {
+    height: 20px;
+    line-height: 20px;
+    cursor: pointer;
+}
+.outline-wrapper .header-title-container {
+    position: absolute;
+    top: var(--outline-header-height);
+    left: var(--padding-gap);
+    right: var(--padding-gap);
+    bottom: var(--padding-gap);
+    overflow-y: auto;
+}
+
+.outline-wrapper .scroll-into-view a {
+    color: black !important;
+    font-weight: 500;
+}
