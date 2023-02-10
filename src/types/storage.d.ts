@@ -1,4 +1,7 @@
-export declare class Storage {
+export declare interface IObjectKeys {
+  [key: string]: string | number;
+}
+export declare class Storage implements IObjectKeys {
   constructor();
   get(key: string): Promise;
   set(key: string, data: any, timeout: number): Promise;

@@ -1,5 +1,8 @@
 class StorageCell {
-  constructor(data, timeout) {
+  private data: any;
+  private timeout: number;
+  private createTime: number;
+  constructor(data: any, timeout: number) {
     this.data = data;
     this.timeout = timeout; // 超时时间，单位秒
     this.createTime = Date.now(); // 创建时间
@@ -9,7 +12,7 @@ class StorageCell {
 class Storage {
   constructor() {}
 
-  async get(key) {
+  async get(key: string) {
     let cacheCell = null;
     const [err, ret] = await this.getStorageData(key);
     if (!err) {
@@ -30,12 +33,12 @@ class Storage {
   }
 
   // 默认永久缓存(0)
-  async set(key, data, timeout = 0) {
+  async set(key: string, data: any, timeout = 0) {
     const cacheCell = new StorageCell(data, timeout);
     return await this.setStorageData(key, cacheCell);
   }
 
-  async remove(key) {
+  async remove(key: string) {
     try {
       await chrome.storage.sync.remove(key);
       return true;
@@ -44,7 +47,7 @@ class Storage {
     }
   }
 
-  async has(key) {
+  async has(key: string) {
     try {
       const allItems = await chrome.storage.sync.get();
       return key in allItems;
@@ -66,13 +69,13 @@ class Storage {
     }
   }
 
-  getStorageData(key) {
+  getStorageData(key: string): Promise<[any, any]> {
     return new Promise((resolve, reject) =>
       chrome.storage.sync.get(key, result => (chrome.runtime.lastError ? resolve([Error(chrome.runtime.lastError.message), undefined]) : resolve([undefined, result]))),
     );
   }
 
-  setStorageData(key, data) {
+  setStorageData(key: string, data: any) {
     return new Promise((resolve, reject) => chrome.storage.sync.set({ [key]: data }, () => resolve(!chrome.runtime.lastError)));
   }
 }

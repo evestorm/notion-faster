@@ -1,12 +1,33 @@
 import "./outline.css";
-import storage from "../../utils/storage/index.js";
-import { debounce, getStyles } from "../../utils/index.js";
+import storage from "../../utils/storage/index";
+import { debounce, getStyles } from "../../utils";
+
+interface IProps {
+  outerArea?: string;
+  headerClassNameList?: [string];
+  indentGap?: number;
+  innerArea?: string;
+  outlineParent?: string;
+  scrollContent?: string;
+}
 export default class Outline {
-  static outlineWrapper = null;
+  static outlineWrapper: Element | null = null;
   static headerClassName = "header-title";
   static outlineClassName = "outline-wrapper";
   static headerContainerClassName = "header-title-container";
-  constructor(props = {}) {
+  private outerArea: string;
+  private headerClassNameList: Array<string>;
+  private indentGap: number;
+  private innerArea: string;
+  private outlineParent: string;
+  private scrollContent: string;
+  private eyeUrl: string;
+  private eyeHiddenUrl: string;
+  isOpen: boolean = true;
+  private bindContentScrollFn: () => void = () => {};
+  private outlineDOMArr: Array<HTMLElement> = [];
+  private scrollContentEle: Element | null = null;
+  constructor(props: IProps = {}) {
     this.outerArea = props.outerArea || "#notion-app"; // parent container
     this.headerClassNameList = props.headerClassNameList || ["notion-header-block", "notion-sub_header-block", "notion-sub_sub_header-block"]; // h1~hN's class name
     this.indentGap = props.indentGap || 15; // Indent of outline tree
@@ -19,8 +40,8 @@ export default class Outline {
   }
   async init() {
     const outlineInfo = await storage.getOutlineInfo();
-    this.outlineShow = outlineInfo ? outlineInfo.show : true;
-    await storage.setOutlineInfo(Object.assign(outlineInfo || {}, { show: this.outlineShow }));
+    this.isOpen = outlineInfo ? outlineInfo.isOpen : true;
+    await storage.setOutlineInfo(Object.assign(outlineInfo || {}, { isOpen: this.isOpen }));
     this.bindContentScrollFn = debounce(this.headerScrollIntoView.bind(this), 500);
     this.observeContentChange();
   }
@@ -39,12 +60,11 @@ export default class Outline {
         }
       }
       mutationList.forEach(mutation => {
+        // @ts-ignore
+        const removedNodes = [...mutation.removedNodes];
         switch (mutation.type) {
           case "childList":
-            if (
-              mutation.removedNodes.length &&
-              ![...mutation.removedNodes].some(v => v.className === Outline.headerClassName || v.className === Outline.headerContainerClassName)
-            ) {
+            if (removedNodes.length && !removedNodes.some(v => v.className === Outline.headerClassName || v.className === Outline.headerContainerClassName)) {
               this.initOutlineWrapper();
             }
             break;
@@ -54,7 +74,7 @@ export default class Outline {
         }
       });
     });
-    observer.observe(mainContainer, {
+    observer.observe(mainContainer!, {
       childList: true,
       // attributes: true,
       characterData: true,
@@ -65,10 +85,10 @@ export default class Outline {
     setTimeout(() => {
       this.outlineDOMArr = this.getOutlineDOM();
       if (!Outline.outlineWrapper) {
-        Outline.outlineWrapper = this.renderOutlineWrapper(document.querySelector(this.outlineParent));
+        Outline.outlineWrapper = this.renderOutlineWrapper(document.querySelector(this.outlineParent)!);
       }
       this.renderOutlineTree(Outline.outlineWrapper, this.outlineDOMArr);
-      this.setShowOutline();
+      this.setStatus();
       this.scrollContentEle = document.querySelector(this.scrollContent);
       this.removeListenerContentScroll();
       this.addListenerContentScroll();
@@ -76,7 +96,8 @@ export default class Outline {
     }, 500);
   }
   getOutlineDOM() {
-    const outlineArr = [];
+    const outlineArr: Array<HTMLElement> = [];
+    // @ts-ignore
     const allChildren = document.querySelector(this.outlineParent).getAllElementChildren();
     for (const item of allChildren) {
       const isHeader = this.headerClassNameList.reduce((pre, cur) => {
@@ -92,14 +113,14 @@ export default class Outline {
     }
     return outlineArr;
   }
-  renderOutlineWrapper(container) {
+  renderOutlineWrapper(container: HTMLElement) {
     container.style.position = "relative";
     const outlineWrapper = document.createElement("div");
     outlineWrapper.classList.add(Outline.outlineClassName);
     container.prepend(outlineWrapper);
     return outlineWrapper;
   }
-  renderOutlineTree(container, DOMArr) {
+  renderOutlineTree(container: Element, DOMArr: Array<HTMLElement>) {
     let headerClassNameList = [...this.headerClassNameList];
     const fragment = document.createDocumentFragment();
     fragment.append(this.generateHeader());
@@ -118,7 +139,7 @@ export default class Outline {
     // const eye = document.createElement('img');
     // eye.className = 'item';
     // eye.addEventListener('click', () => {
-    //   this.outlineShow = !this.outlineShow;
+    //   this.isOpen = !this.isOpen;
     //   this.setShowOutline();
     // });
     // this.eye = eye;
@@ -126,12 +147,13 @@ export default class Outline {
     header.append(title);
     return header;
   }
-  generateOutlineContainer(DOMArr, headerClassNameList) {
+  generateOutlineContainer(DOMArr: Array<HTMLElement>, headerClassNameList: Array<string>) {
     const headerContainer = document.createElement("div");
     headerContainer.className = Outline.headerContainerClassName;
     // 有h1，则 headerClassNameList 不变
     // 无h1，找有没有h2，有则从 h2 开始， headerClassNameList 往后不变
     for (let i = 0; i < headerClassNameList.length; i++) {
+      // @ts-ignore
       if (!DOMArr.some(v => v.headerClassName === headerClassNameList[i])) {
         headerClassNameList.splice(i, 1);
         i--;
@@ -142,8 +164,9 @@ export default class Outline {
     for (const dom of DOMArr) {
       const div = document.createElement("div");
       div.className = "header-title";
+      // @ts-ignore
       div.style.paddingLeft = headerClassNameList.findIndex(v => v === dom.headerClassName) * this.indentGap + "px";
-      const dataBlockId = dom.getAttribute("data-block-id");
+      const dataBlockId = dom.getAttribute("data-block-id")!;
       const id = dataBlockId.replaceAll("-", "");
       div.innerHTML = `<a href="#${id}">${dom.innerText}</a>`;
       div.title = `${dom.innerText}`;
@@ -152,21 +175,25 @@ export default class Outline {
     }
     return headerContainer;
   }
-  setShowOutline() {
-    // this.eye.src = this.outlineShow ? this.eyeHiddenUrl : this.eyeUrl;
-    this.outlineShow ? Outline.outlineWrapper.classList.add("show") : Outline.outlineWrapper.classList.remove("show");
+  setStatus() {
+    // this.eye.src = this.isOpen ? this.eyeHiddenUrl : this.eyeUrl;
+    // @ts-ignore
+    this.isOpen ? Outline.outlineWrapper.classList.add("show") : Outline.outlineWrapper.classList.remove("show");
   }
   addListenerContentScroll() {
+    // @ts-ignore
     this.scrollContentEle.addEventListener("scroll", this.bindContentScrollFn);
   }
   removeListenerContentScroll() {
+    // @ts-ignore
     this.scrollContentEle.removeEventListener("scroll", this.bindContentScrollFn);
   }
   headerScrollIntoView() {
-    const ele = this.scrollContentEle;
+    const ele = this.scrollContentEle!;
     for (const header of this.outlineDOMArr) {
-      if (header.offsetTop < ele.scrollTop + ele.clientHeight && header.offsetTop + parseInt(header.getBoundingClientRect().height) >= ele.scrollTop) {
-        const targets = document.getElementsByClassName(Outline.headerClassName);
+      if (header.offsetTop < ele.scrollTop + ele.clientHeight && header.offsetTop + parseInt(String(header.getBoundingClientRect().height)) >= ele.scrollTop) {
+        // @ts-ignore
+        const targets = [...document.getElementsByClassName(Outline.headerClassName)];
         [...targets].forEach(v => v.classList.remove("scroll-into-view"));
         const firstTarget = [...targets].find(v => v.dataset.id === header.dataset.blockId);
         if (firstTarget) {
