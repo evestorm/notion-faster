@@ -19,7 +19,7 @@
     ],
     "run_at": "document_end"
   }],
-  "permissions": ["scripting", "storage"],
+  "permissions": ["storage"],
   "web_accessible_resources": [
     {
       "matches": ["https:\/\/www.notion.so\/*"],
