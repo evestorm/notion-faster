@@ -1,5 +1,3 @@
-# NOTION FASTER
-
 <p align="center">
     <h1>Notion Faster</h1>
     A chrome extension to improve the efficiency of the notion web app
