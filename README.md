@@ -4,7 +4,7 @@
 </p>
 
 ## Installation
-**Click the image** below to install (soon later):
+**Click the image** below to install:
 
 <a href="https://chrome.google.com/webstore/detail/jaklejjegklojefgmimdllbkhhkjfald/">
   <img src="./images/chrome-store-logo.png" width="250px" alt="chrome-store-logo">
