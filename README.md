@@ -7,7 +7,7 @@
 **Click the image** below to install (soon later):
 
 <a href="https://chrome.google.com/webstore/detail/jaklejjegklojefgmimdllbkhhkjfald/">
-  <img src="images/chrome-store-logo.png" width="250px" alt="chrome-store-logo">
+  <img src="./images/chrome-store-logo.png" width="250px" alt="chrome-store-logo">
 </a>
 
 Please rate it on [chrome web store](https://chrome.google.com/webstore/detail/jaklejjegklojefgmimdllbkhhkjfald/) or star it on github if you like it. Your encouragement will help me make it better, thanks!
