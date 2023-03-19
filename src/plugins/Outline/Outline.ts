@@ -114,6 +114,8 @@ export default class Outline {
     return outlineArr;
   }
   renderOutlineWrapper(container: HTMLElement) {
+    const outlineWrapperDOM = document.querySelector(`.${Outline.outlineClassName}`);
+    if (outlineWrapperDOM) return outlineWrapperDOM;
     container.style.position = "relative";
     const outlineWrapper = document.createElement("div");
     outlineWrapper.classList.add(Outline.outlineClassName);
@@ -168,7 +170,11 @@ export default class Outline {
       div.style.paddingLeft = headerClassNameList.findIndex(v => v === dom.headerClassName) * this.indentGap + "px";
       const dataBlockId = dom.getAttribute("data-block-id")!;
       const id = dataBlockId.replaceAll("-", "");
-      div.innerHTML = `<a href="#${id}">${dom.innerText}</a>`;
+      const textNode = document.createTextNode(dom.innerText);
+      const anchorNode = document.createElement("a");
+      anchorNode.href = `#${id}`;
+      anchorNode.appendChild(textNode);
+      div.appendChild(anchorNode);
       div.title = `${dom.innerText}`;
       div.dataset.id = dataBlockId;
       headerContainer.append(div);
